@@ -41,10 +41,19 @@ footer {
   flex-direction: column;
 }
 
+
 .select-container {
+  display: flex;
+  align-items: center;
   margin-bottom: 20px;
   margin-right: 20%;
 }
+
+.limit-offset-container {
+  display: flex;
+  gap: 50px; /* Ajuste cet espacement selon tes préférences */
+}
+
 
 .condition-container {
   display: flex;
@@ -53,10 +62,7 @@ footer {
 }
 
 
-.select-container:last-child,
-.condition-container:last-child {
-  margin-bottom: 0;
-}
+
 
 .query-container {
   margin-bottom: 20px;
