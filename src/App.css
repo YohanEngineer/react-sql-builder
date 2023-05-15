@@ -1,38 +1,89 @@
 .App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6em;
+  color: white;
+  background-color: #000;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  color: white;
+  background-color: #000;
+  text-align: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  padding: 10px;
+  justify-content: center; 
+  align-items: center;
+  justify-content: flex-start;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.form-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+}
+
+.select-container {
+  margin-bottom: 20px;
+  margin-right: 20%;
+}
+
+.condition-container {
+  display: flex;
+  justify-content: left;
+  margin-bottom: 20px;
+}
+
+
+.select-container:last-child,
+.condition-container:last-child {
+  margin-bottom: 0;
+}
+
+.query-container {
+  margin-bottom: 20px;
+}
+
+.space {
+  margin-top: 100px;
+}
+
+.submit-container {
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.sql-query-input {
+  width: 100%;
+  resize: vertical;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+@media screen and (max-width: 480px) {
+  .container {
+    padding: 10px;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+@media screen and (max-width: 768px) {
+  .form-container {
+    flex-direction: column;
   }
 }
