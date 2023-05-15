@@ -140,7 +140,7 @@ return (
         <button className="reset-btn btn btn-danger" onClick={resetQuery}>Réinitialiser la requête</button>
         </div>
         <div className="select-container">
-        {<DownloadButton sqlQuery={importedQuery || sqlQuery} />}
+        {<DownloadButton sqlQuery={editedSqlQuery} />}
         </div>
         <div className="select-container">
         <ImportButton onImport={handleImport} />
