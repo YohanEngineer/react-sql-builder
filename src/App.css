@@ -61,9 +61,6 @@ footer {
   margin-bottom: 20px;
 }
 
-
-
-
 .query-container {
   margin-bottom: 20px;
 }
@@ -81,6 +78,19 @@ footer {
   width: 100%;
   resize: vertical;
 }
+
+.table td {
+  border-right: 1px solid #ddd;
+}
+
+.table th {
+  border-right: 1px solid #ddd;
+}
+
+.table td:first-child, .table th:first-child {
+  border-left: 1px solid #ddd;
+}
+
 
 @media screen and (max-width: 480px) {
   .container {
