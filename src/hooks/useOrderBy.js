@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 const useOrderBy = (columns) => {
   const [selectedOrderBy, setSelectedOrderBy] = useState([]);
+  const [orderDirection, setOrderDirection] = useState('');
 
   const handleOrderByChange = (event) => {
     const selectedOptions = Array.from(event.target.selectedOptions).map((option) => ({
@@ -19,11 +20,13 @@ const useOrderBy = (columns) => {
     });
   };
 
-  return {
-    selectedOrderBy,
-    handleOrderByChange,
-    handleOrderDirectionChange,
+  const clearOrderBy = () => {
+    setSelectedOrderBy([]);
+    setOrderDirection('');
   };
+
+  return { selectedOrderBy, orderDirection, handleOrderByChange, handleOrderDirectionChange, clearOrderBy };
+
 };
 
 export default useOrderBy;

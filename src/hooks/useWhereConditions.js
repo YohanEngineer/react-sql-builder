@@ -8,27 +8,27 @@ const useWhereConditions = (columns) => {
     switch (columnType) {
       case 'character varying':
         return ['=', '<>', '>', '<', '>=', '<=', 'LIKE', 'ILIKE', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL',
-                'REGEXP', '~', 'SUBSTRING', 'LEFT', 'RIGHT', 'TRIM', 'UPPER', 'LOWER'];
+          'REGEXP', '~', 'SUBSTRING', 'LEFT', 'RIGHT', 'TRIM', 'UPPER', 'LOWER'];
       case 'bigint':
         return ['=', '<>', '>', '<', '>=', '<=', 'BETWEEN', 'NOT BETWEEN', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
       case 'integer':
-          return ['=', '<>', '>', '<', '>=', '<=', 'BETWEEN', 'NOT BETWEEN', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
+        return ['=', '<>', '>', '<', '>=', '<=', 'BETWEEN', 'NOT BETWEEN', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
       case 'date':
         return ['=', '<>', '>', '<', '>=', '<=', 'BETWEEN', 'NOT BETWEEN', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL',
-                'DATE', 'TIME', 'TIMESTAMP', 'INTERVAL', 'EXTRACT', 'DATE_ADD', 'DATE_SUB'];
+          'DATE', 'TIME', 'TIMESTAMP', 'INTERVAL', 'EXTRACT', 'DATE_ADD', 'DATE_SUB'];
       case 'boolean':
         return ['=', '<>', 'IS NULL', 'IS NOT NULL'];
       default:
         return [];
     }
   }
-  
+
 
   const openFilterDialog = async () => {
     const columnsOptions = columns
       .map((column) => `<option value="${column.column_name}" data-type="${column.data_type}">${column.column_name} (${column.data_type})</option>`)
       .join('');
-  
+
     const { value: formValues } = await Swal.fire({
       title: 'Ajouter une condition WHERE',
       html:
@@ -42,7 +42,7 @@ const useWhereConditions = (columns) => {
       didOpen: () => {
         const columnSelect = document.getElementById('swal-column');
         const operatorSelect = document.getElementById('swal-operator');
-  
+
         const updateOperators = () => {
           const selectedColumnType = columnSelect.options[columnSelect.selectedIndex].dataset.type;
           const operators = getWhereOperatorsForColumnType(selectedColumnType);
@@ -50,7 +50,7 @@ const useWhereConditions = (columns) => {
             .map((operator) => `<option value="${operator}">${operator}</option>`)
             .join('');
         };
-  
+
         columnSelect.addEventListener('change', updateOperators);
         updateOperators();
       },
@@ -62,10 +62,11 @@ const useWhereConditions = (columns) => {
         };
       },
     });
-  
+
     if (formValues) {
       return {
         columnName: formValues.columnName,
+        columnType: columns.find((column) => column.column_name === formValues.columnName).data_type,
         operator: formValues.operator,
         value: formValues.value,
       };
@@ -73,7 +74,7 @@ const useWhereConditions = (columns) => {
       return null;
     }
   };
-  
+
 
   const handleAddWhereClick = async () => {
     const filterCondition = await openFilterDialog();
@@ -83,7 +84,12 @@ const useWhereConditions = (columns) => {
     }
   };
 
-  return { whereConditions, handleAddWhereClick };
+  const clearWhereConditions = () => {
+    setWhereConditions([]);
+  };
+
+  return { whereConditions, handleAddWhereClick, clearWhereConditions };
+
 };
 
 export default useWhereConditions;
