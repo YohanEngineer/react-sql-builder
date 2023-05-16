@@ -7,7 +7,7 @@ export const ColumnSelect = ({ columns, selectedColumns, onChange }) => (
     <br />
     <select
       id="column-select"
-      className="form-select"
+      className="form-select form-select-md"
       multiple
       value={selectedColumns}
       onChange={onChange}
