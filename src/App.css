@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  margin-top: 2%;
 }
 
 header {
@@ -77,6 +77,10 @@ footer {
 .sql-query-input {
   width: 100%;
   resize: vertical;
+}
+
+.table thead {
+  border-top: 1px solid #ddd;
 }
 
 .table td {
