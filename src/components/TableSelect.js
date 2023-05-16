@@ -2,9 +2,9 @@ import React from 'react';
 
 export const TableSelect = ({ tables, selectedTable, onChange }) => (
   <>
-    <label htmlFor="table-select" className="form-label">Sélectionnez une table:</label>
+    {/* <label htmlFor="table-select" className="form-label">Sélectionnez une table:</label>
     <br />
-    <br />
+    <br /> */}
     <select id="table-select" className="form-select" value={selectedTable} onChange={onChange}>
       <option value="">-- Choisissez une table --</option>
       {tables
