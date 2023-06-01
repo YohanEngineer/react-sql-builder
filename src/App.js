@@ -21,9 +21,6 @@ import useOrderBy from './hooks/useOrderBy';
 // Importe le CSS de l'application
 import './App.css';
 
-// Défini le nombre de résultats par page
-const RESULTS_PER_PAGE = 20;
-
 // Définition du composant App
 function App() {
     // Utilise le hook useTables pour récupérer les tables disponibles
@@ -55,8 +52,7 @@ function App() {
     const [queryResult, setQueryResult] = useState([]);
     // Initialise et gère l'état de l'affichage des résultats
     const [showResults, setShowResults] = useState(false);
-    // Initialise et gère l'état de la page actuelle des résultats
-    const [currentPage, setCurrentPage] = useState(1);
+
 
     // Définit les gestionnaires d'événements pour les changements dans les entrées de l'interface utilisateur
 
@@ -64,6 +60,8 @@ function App() {
     const handleTableChange = (event) => {
         setSelectedTable(event.target.value);
         setSelectedColumns([]);
+        setSelectedForeignTables([]); // Réinitialise les tables étrangères sélectionnées
+        setForeignKeys([]); // Réinitialise les relations de clés étrangères
     };
 
 
@@ -87,6 +85,7 @@ function App() {
         setOffset(value === '' ? null : parseInt(value));
     };
 
+
     // Effet pour mettre à jour la requête SQL éditée chaque fois que la requête SQL est mise à jour.
     useEffect(() => {
         setEditedSqlQuery(sqlQuery);
@@ -102,6 +101,45 @@ function App() {
         setEditedSqlQuery(query);
     };
 
+    const [selectedForeignTables, setSelectedForeignTables] = useState([]);
+
+    // Initialise et gère l'état des relations de clés étrangères
+    const [foreignKeys, setForeignKeys] = useState([]);
+
+    useEffect(() => {
+        const fetchForeignKeys = async () => {
+            const response = await fetch(`http://localhost:9999/information-schema/foreign-keys/${selectedTable}`);
+            const data = await response.json();
+
+            // Prépare un tableau pour stocker les tables et les colonnes étrangères uniques
+            const foreignTablesAndColumns = [];
+
+            data.forEach(fk => {
+                // Vérifie si la table étrangère est déjà dans le tableau
+                const foreignTableIndex = foreignTablesAndColumns.findIndex(foreign => foreign.tableName === fk.foreignTableName);
+
+                if (foreignTableIndex === -1) {
+                    // Si la table étrangère n'est pas déjà dans le tableau, ajoutez-la avec la colonne correspondante
+                    foreignTablesAndColumns.push({
+                        tableName: fk.foreignTableName,
+                        columnNames: [fk.foreignColumnName]
+                    });
+                } else {
+                    // Si la table étrangère est déjà dans le tableau, ajoutez simplement la colonne à la liste des colonnes
+                    foreignTablesAndColumns[foreignTableIndex].columnNames.push(fk.foreignColumnName);
+                }
+            });
+
+            // Mettre à jour l'état avec les tables et les colonnes étrangères
+            setForeignKeys(foreignTablesAndColumns);
+        };
+
+        if (selectedTable) {
+            fetchForeignKeys();
+        }
+    }, [selectedTable]);
+
+
 
     // Réinitialise tous les états de la requête SQL.
     const resetQuery = () => {
@@ -115,10 +153,6 @@ function App() {
         setEditedSqlQuery('');
     };
 
-    // Calcule les indices de début et de fin pour la pagination des résultats.
-    const endIndex = currentPage * RESULTS_PER_PAGE;
-    const startIndex = endIndex - RESULTS_PER_PAGE;
-    const currentResults = useMemo(() => queryResult.slice(startIndex, endIndex), [queryResult, startIndex, endIndex]);
 
     // Exécute la requête SQL.
     const executeQuery = async () => {
@@ -138,6 +172,7 @@ function App() {
             console.error('Erreur lors de l\'exécution de la requête SQL');
         }
     };
+
 
     // Exporte les résultats de la requête SQL au format CSV.
     const exportToCsv = () => {
@@ -167,12 +202,27 @@ function App() {
                     <div className="form-container">
                         <div className="select-container">
                             <TableSelect tables={tables} selectedTable={selectedTable} onChange={handleTableChange} />
-                            <br />
-                            <br />
+                        </div>
+                        <div className="select-container">
                             {selectedTable && (
                                 <ColumnSelect columns={columns} selectedColumns={selectedColumns} onChange={handleColumnChange} />
                             )}
                         </div>
+                        <div className="select-container">
+                            {selectedTable && foreignKeys.length > 0 && (
+                                <div>
+                                    <label>Tables étrangères :</label>
+                                    <br />
+                                    <br />
+                                    <select multiple value={selectedForeignTables}>
+                                        {foreignKeys.map((foreignKey, index) => (
+                                            <option key={index} value={foreignKey.tableName}>{foreignKey.tableName}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="condition-container">
                             {selectedTable && <button className="btn btn-light" onClick={handleAddWhereClick}><b>Ajouter une condition</b></button>}
                         </div>
@@ -195,7 +245,7 @@ function App() {
                             )}
                         </div>
                         <div className="query-container">
-                            <textarea className="sql-query-input" value={editedSqlQuery} onChange={handleSqlQueryChange} rows="10" cols="80"></textarea>
+                            <textarea className="sql-query-input" value={editedSqlQuery} onChange={handleSqlQueryChange} rows="6" cols="80"></textarea>
                         </div>
                         <div className='select-container'>
                             <button className="reset-btn btn btn-danger" onClick={resetQuery}>Réinitialiser la requête</button>
@@ -213,8 +263,8 @@ function App() {
                 </div>
             ) : (
                 <div className="result-container">
-                    {queryResult && queryResult.length > 0 ? (
-                        <>
+                    <div style={{ maxHeight: "800px", overflow: "auto", width: "1000px" }}>
+                        {queryResult && queryResult.length > 0 ? (
                             <table className="table">
                                 <thead>
                                     <tr>
@@ -224,7 +274,7 @@ function App() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {currentResults.map((row, rowIndex) => (
+                                    {queryResult.map((row, rowIndex) => (
                                         <tr key={rowIndex}>
                                             {Object.values(row).map((value, valueIndex) => (
                                                 <td key={valueIndex}>{value !== null ? value : "NULL"}</td>
@@ -233,30 +283,20 @@ function App() {
                                     ))}
                                 </tbody>
                             </table>
-                            <div className="pagination-buttons">
-                                <button
-                                    className="btn btn-light"
-                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                    disabled={currentPage === 1}
-                                >
-                                    Page précédente
-                                </button>
-                                <button
-                                    className="btn btn-light"
-                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(queryResult.length / RESULTS_PER_PAGE)))}
-                                    disabled={currentPage === Math.ceil(queryResult.length / RESULTS_PER_PAGE)}
-                                >
-                                    Page suivante
-                                </button>
-                            </div>
-                            <p>  Page {currentPage} sur {Math.ceil(queryResult.length / RESULTS_PER_PAGE)}</p>
+                        ) : (
+                            <p>Pas de résultats</p>
+                        )}
+                    </div>
+                    {queryResult && queryResult.length > 0 && (
+                        <div>
                             <button className="btn btn-primary" onClick={exportToCsv}>Exporter en CSV</button>
-                        </>
-                    ) : (
-                        <p>Pas de résultats</p>
+                        </div>
                     )}
-                    <button className="btn btn-secondary" onClick={() => setShowResults(false)}>Retour</button>
+                    <div>
+                        <button className="btn btn-secondary" onClick={() => setShowResults(false)}>Retour</button>
+                    </div>
                 </div>
+
             )}
         </div>
     );

@@ -26,6 +26,8 @@ const useWhereConditions = (columns) => {
 
   const openFilterDialog = async () => {
     const columnsOptions = columns
+      .slice
+      .sort
       .map((column) => `<option value="${column.column_name}" data-type="${column.data_type}">${column.column_name} (${column.data_type})</option>`)
       .join('');
 
