@@ -1,14 +1,13 @@
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy, joins) => {
+  const [query, setQuery] = useState('');
 
-  const query = useMemo(() => {
+  useEffect(() => {
     if (!selectedTable) {
-      return '';
+      setQuery('');
+      return;
     }
-
-    console.log('useMemo called');
-
 
     const generateJoinString = (join) => {
       const foreignTableName = join.foreignTableName;
@@ -20,18 +19,13 @@ const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, off
       const { columnName, columnType, operator, value } = condition;
       const isNumericColumn = ['integer', 'bigint', 'numeric', 'float'].includes(columnType);
 
-      // Pour 'IS NULL' et 'IS NOT NULL', la valeur n'est pas nécessaire
       if (['IS NULL', 'IS NOT NULL'].includes(operator)) {
         return `${columnName} ${operator}`;
-      }
-      // Pour 'IN' et 'NOT IN', traiter la valeur comme une liste séparée par des virgules
-      else if (['IN', 'NOT IN'].includes(operator)) {
+      } else if (['IN', 'NOT IN'].includes(operator)) {
         const valuesList = value.split(',').map(item => item.trim());
         const formattedValues = valuesList.map(item => isNumericColumn || columnType === 'boolean' ? item : `'${item}'`).join(', ');
         return `${columnName} ${operator} (${formattedValues})`;
-      }
-      // Pour les autres opérateurs, formattez simplement la valeur en fonction du type de colonne
-      else {
+      } else {
         if (isNumericColumn || columnType === 'boolean') {
           return `${columnName} ${operator} ${value}`;
         } else if (columnType === 'character varying' || columnType === 'date') {
@@ -52,11 +46,8 @@ const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, off
     const columnsString = selectedColumns.length > 0 ? selectedColumns.join(', ') : '*';
     let queryString = `SELECT ${columnsString} \nFROM ${selectedTable}`;
 
-    console.log("length :: " + joins.length);
-
     if (joins.length > 0) {
       joins.forEach((join) => {
-        console.log(join);
         queryString += `\n${generateJoinString(join)}`;
       });
     }
@@ -83,8 +74,7 @@ const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, off
     }
 
     queryString += ';';
-    console.log(queryString);
-    return queryString;
+    setQuery(queryString);
   }, [selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy, joins]);
 
   return query;
