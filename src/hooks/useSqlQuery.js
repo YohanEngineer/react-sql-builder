@@ -12,11 +12,25 @@ const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, off
       const { columnName, columnType, operator, value } = condition;
       const isNumericColumn = ['integer', 'bigint', 'numeric', 'float'].includes(columnType);
 
-      // Construire la condition WHERE en fonction du type de colonne
-      if (isNumericColumn) {
-        return `${columnName} ${operator} ${value}`;
-      } else {
-        return `${columnName} ${operator} '${value}'`;
+      // Pour 'IS NULL' et 'IS NOT NULL', la valeur n'est pas nécessaire
+      if (['IS NULL', 'IS NOT NULL'].includes(operator)) {
+        return `${columnName} ${operator}`;
+      }
+      // Pour 'IN' et 'NOT IN', traiter la valeur comme une liste séparée par des virgules
+      else if (['IN', 'NOT IN'].includes(operator)) {
+        const valuesList = value.split(',').map(item => item.trim());
+        const formattedValues = valuesList.map(item => isNumericColumn || columnType === 'boolean' ? item : `'${item}'`).join(', ');
+        return `${columnName} ${operator} (${formattedValues})`;
+      }
+      // Pour les autres opérateurs, formattez simplement la valeur en fonction du type de colonne
+      else {
+        if (isNumericColumn || columnType === 'boolean') {
+          return `${columnName} ${operator} ${value}`;
+        } else if (columnType === 'character varying' || columnType === 'date') {
+          return `${columnName} ${operator} '${value}'`;
+        } else {
+          throw new Error(`Type de colonne non pris en charge : ${columnType}`);
+        }
       }
     };
 

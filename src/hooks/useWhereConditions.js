@@ -7,15 +7,13 @@ const useWhereConditions = (columns) => {
   function getWhereOperatorsForColumnType(columnType) {
     switch (columnType) {
       case 'character varying':
-        return ['=', '<>', '>', '<', '>=', '<=', 'LIKE', 'ILIKE', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL',
-          'REGEXP', '~', 'SUBSTRING', 'LEFT', 'RIGHT', 'TRIM', 'UPPER', 'LOWER'];
+        return ['=', '<>', '>', '<', '>=', '<=', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
       case 'bigint':
-        return ['=', '<>', '>', '<', '>=', '<=', 'BETWEEN', 'NOT BETWEEN', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
+        return ['=', '<>', '>', '<', '>=', '<=', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
       case 'integer':
-        return ['=', '<>', '>', '<', '>=', '<=', 'BETWEEN', 'NOT BETWEEN', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
+        return ['=', '<>', '>', '<', '>=', '<=', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
       case 'date':
-        return ['=', '<>', '>', '<', '>=', '<=', 'BETWEEN', 'NOT BETWEEN', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL',
-          'DATE', 'TIME', 'TIMESTAMP', 'INTERVAL', 'EXTRACT', 'DATE_ADD', 'DATE_SUB'];
+        return ['=', '<>', '>', '<', '>=', '<=', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
       case 'boolean':
         return ['=', '<>', 'IS NULL', 'IS NOT NULL'];
       default:
@@ -26,8 +24,8 @@ const useWhereConditions = (columns) => {
 
   const openFilterDialog = async () => {
     const columnsOptions = columns
-      .slice
-      .sort
+      .slice()
+      .sort()
       .map((column) => `<option value="${column.column_name}" data-type="${column.data_type}">${column.column_name} (${column.data_type})</option>`)
       .join('');
 
