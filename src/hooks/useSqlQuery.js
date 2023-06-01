@@ -1,12 +1,20 @@
 import { useMemo } from 'react';
 
-const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy) => {
-
+const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy, joins) => {
 
   const query = useMemo(() => {
     if (!selectedTable) {
       return '';
     }
+
+    console.log('useMemo called');
+
+
+    const generateJoinString = (join) => {
+      const foreignTableName = join.foreignTableName;
+      const foreignColumnName = join.foreignColumnName;
+      return `JOIN ${foreignTableName} ON ${selectedTable}.${foreignColumnName} = ${foreignTableName}.${foreignColumnName}`;
+    };
 
     const generateConditionString = (condition) => {
       const { columnName, columnType, operator, value } = condition;
@@ -44,6 +52,14 @@ const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, off
     const columnsString = selectedColumns.length > 0 ? selectedColumns.join(', ') : '*';
     let queryString = `SELECT ${columnsString} \nFROM ${selectedTable}`;
 
+    console.log("length :: " + joins.length);
+
+    if (joins.length > 0) {
+      joins.forEach((join) => {
+        console.log(join);
+        queryString += `\n${generateJoinString(join)}`;
+      });
+    }
     if (whereConditions.length > 0) {
       const whereString = generateWhereString();
       if (whereString) {
@@ -67,8 +83,9 @@ const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, off
     }
 
     queryString += ';';
+    console.log(queryString);
     return queryString;
-  }, [selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy]);
+  }, [selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy, joins]);
 
   return query;
 };

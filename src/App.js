@@ -11,13 +11,14 @@ import { OffsetSelect } from './components/OffsetSelect';
 import { DownloadButton } from './components/DownloadButton';
 import { ImportButton } from './components/ImportButton';
 import OrderBySelect from './components/OrderBySelect';
+import JoinSelect from './components/JoinSelect';
 // Importe des hooks personnalisés pour la récupération de données
 import { useTables } from './hooks/useTables';
 import { useColumns } from './hooks/useColumns';
 import useSqlQuery from './hooks/useSqlQuery';
 import useWhereConditions from './hooks/useWhereConditions';
 import useOrderBy from './hooks/useOrderBy';
-
+import useForeignTables from './hooks/useForeignTables';
 // Importe le CSS de l'application
 import './App.css';
 
@@ -45,8 +46,25 @@ function App() {
     // Initialise et gère l'état de la requête SQL éditée
     const [editedSqlQuery, setEditedSqlQuery] = useState('');
 
+    const foreignKeys = useForeignTables(selectedTable);
+    const [joins, setJoins] = useState([]);
+
+    const handleAddJoinClick = () => {
+        setJoins([...joins, { foreignTableName: '', foreignColumnName: '' }]);
+    };
+
+    const handleJoinChange = (index, updatedJoin) => {
+        const newJoins = [...joins.slice(0, index), updatedJoin, ...joins.slice(index + 1)];
+        setJoins(newJoins);
+    };
+    
+
+    const handleRemoveJoinClick = (index) => {
+        setJoins(joins.filter((join, joinIndex) => joinIndex !== index));
+    };
+
     // Utilise le hook useSqlQuery pour construire la requête SQL en fonction des états actuels
-    const sqlQuery = useSqlQuery(selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy, orderDirection);
+    const sqlQuery = useSqlQuery(selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy, orderDirection, joins);
 
     // Initialise et gère l'état du résultat de la requête
     const [queryResult, setQueryResult] = useState([]);
@@ -60,10 +78,7 @@ function App() {
     const handleTableChange = (event) => {
         setSelectedTable(event.target.value);
         setSelectedColumns([]);
-        setSelectedForeignTables([]); // Réinitialise les tables étrangères sélectionnées
-        setForeignKeys([]); // Réinitialise les relations de clés étrangères
     };
-
 
     // Gestionnaire pour le changement de colonne sélectionnée.
     const handleColumnChange = (event) => {
@@ -100,46 +115,6 @@ function App() {
     const handleImport = (query) => {
         setEditedSqlQuery(query);
     };
-
-    const [selectedForeignTables, setSelectedForeignTables] = useState([]);
-
-    // Initialise et gère l'état des relations de clés étrangères
-    const [foreignKeys, setForeignKeys] = useState([]);
-
-    useEffect(() => {
-        const fetchForeignKeys = async () => {
-            const response = await fetch(`http://localhost:9999/information-schema/foreign-keys/${selectedTable}`);
-            const data = await response.json();
-
-            // Prépare un tableau pour stocker les tables et les colonnes étrangères uniques
-            const foreignTablesAndColumns = [];
-
-            data.forEach(fk => {
-                // Vérifie si la table étrangère est déjà dans le tableau
-                const foreignTableIndex = foreignTablesAndColumns.findIndex(foreign => foreign.tableName === fk.foreignTableName);
-
-                if (foreignTableIndex === -1) {
-                    // Si la table étrangère n'est pas déjà dans le tableau, ajoutez-la avec la colonne correspondante
-                    foreignTablesAndColumns.push({
-                        tableName: fk.foreignTableName,
-                        columnNames: [fk.foreignColumnName]
-                    });
-                } else {
-                    // Si la table étrangère est déjà dans le tableau, ajoutez simplement la colonne à la liste des colonnes
-                    foreignTablesAndColumns[foreignTableIndex].columnNames.push(fk.foreignColumnName);
-                }
-            });
-
-            // Mettre à jour l'état avec les tables et les colonnes étrangères
-            setForeignKeys(foreignTablesAndColumns);
-        };
-
-        if (selectedTable) {
-            fetchForeignKeys();
-        }
-    }, [selectedTable]);
-
-
 
     // Réinitialise tous les états de la requête SQL.
     const resetQuery = () => {
@@ -209,20 +184,17 @@ function App() {
                             )}
                         </div>
                         <div className="select-container">
-                            {selectedTable && foreignKeys.length > 0 && (
-                                <div>
-                                    <label>Tables étrangères :</label>
-                                    <br />
-                                    <br />
-                                    <select multiple value={selectedForeignTables}>
-                                        {foreignKeys.map((foreignKey, index) => (
-                                            <option key={index} value={foreignKey.tableName}>{foreignKey.tableName}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            )}
+                            {selectedTable && joins.map((join, index) => (
+                                <JoinSelect
+                                    key={index}
+                                    joins={join}
+                                    foreignKeys={foreignKeys}
+                                    onChange={(updatedJoin) => handleJoinChange(index, updatedJoin)}
+                                    onRemove={() => handleRemoveJoinClick(index)}
+                                />
+                            ))}
+                            {selectedTable && <button className="btn btn-light" onClick={handleAddJoinClick}><b>Ajouter une jointure</b></button>}
                         </div>
-
                         <div className="condition-container">
                             {selectedTable && <button className="btn btn-light" onClick={handleAddWhereClick}><b>Ajouter une condition</b></button>}
                         </div>
