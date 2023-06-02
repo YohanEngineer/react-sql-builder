@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect } from 'react';
 
 const JoinSelect = ({ joins, foreignKeys, onChange, onRemove }) => {
     const handleForeignTableChange = (event) => {
@@ -16,12 +17,42 @@ const JoinSelect = ({ joins, foreignKeys, onChange, onRemove }) => {
         });
     };
 
+    const handleJoinTypeChange = (event) => {
+        onChange({
+            ...joins,
+            joinType: event.target.value
+        });
+    };
+
+    const handleColumnNameChange = () => {
+        const relevantForeignKey = foreignKeys.find(fk => fk.foreignTableName === joins.foreignTableName);
+        if (relevantForeignKey) {
+            onChange({
+                ...joins,
+                columnName: relevantForeignKey.columnName
+            });
+        }
+    };
+
+    useEffect(() => {
+        handleColumnNameChange();
+    }, [joins.foreignTableName]);
+
     const foreignKeyOptions = foreignKeys.filter(
         (fk) => fk.foreignTableName === joins.foreignTableName
     );
 
     return (
         <div className="joins-select-container">
+            <select
+                className="form-select"
+                value={joins.joinType || ''}
+                onChange={handleJoinTypeChange}
+            >
+                <option value="">Type de jointure</option>
+                <option value="JOIN">JOIN</option>
+                <option value="LEFT JOIN">LEFT JOIN</option>
+            </select>
             <select
                 className="form-select"
                 value={joins.foreignTableName}

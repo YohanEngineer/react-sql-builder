@@ -50,15 +50,13 @@ function App() {
     const [joins, setJoins] = useState([]);
 
     const handleAddJoinClick = () => {
-        setJoins([...joins, { foreignTableName: '', foreignColumnName: '' }]);
+        setJoins([...joins, { column: '', joinType: '', foreignTableName: '', foreignColumnName: '' }]);
     };
 
     const handleJoinChange = (index, updatedJoin) => {
         const newJoins = [...joins.slice(0, index), updatedJoin, ...joins.slice(index + 1)];
         setJoins(newJoins);
-        console.log(joins);
     };
-
 
     const handleRemoveJoinClick = (index) => {
         setJoins(joins.filter((join, joinIndex) => joinIndex !== index));
