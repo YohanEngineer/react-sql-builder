@@ -1,6 +1,6 @@
 import React from 'react';
 
-const JoinSelect = ({ joins, foreignKeys, onChange, onRemove}) => {
+const JoinSelect = ({ joins, foreignKeys, onChange, onRemove }) => {
     const handleForeignTableChange = (event) => {
         onChange({
             ...joins,
@@ -48,9 +48,6 @@ const JoinSelect = ({ joins, foreignKeys, onChange, onRemove}) => {
                     ))}
                 </select>
             )}
-            <button className="btn btn-sm btn-light">
-                Ajouter
-            </button>
             <button className="btn btn-sm btn-light" onClick={onRemove}>
                 Retirer
             </button>

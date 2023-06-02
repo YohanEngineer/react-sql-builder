@@ -40,7 +40,7 @@ function App() {
 
     // Utilise les hooks personnalisés pour gérer les conditions WHERE et ORDER BY pour la requête SQL
     const { whereConditions, handleAddWhereClick, clearWhereConditions } = useWhereConditions(columns);
-    const { selectedOrderBy, orderDirection, handleOrderByChange, handleOrderDirectionChange, clearOrderBy } = useOrderBy(columns);
+    const { selectedOrderBy, handleOrderByChange, handleOrderDirectionChange, clearOrderBy } = useOrderBy(columns);
 
 
     // Initialise et gère l'état de la requête SQL éditée
@@ -56,15 +56,16 @@ function App() {
     const handleJoinChange = (index, updatedJoin) => {
         const newJoins = [...joins.slice(0, index), updatedJoin, ...joins.slice(index + 1)];
         setJoins(newJoins);
+        console.log(joins);
     };
-    
+
 
     const handleRemoveJoinClick = (index) => {
         setJoins(joins.filter((join, joinIndex) => joinIndex !== index));
     };
 
     // Utilise le hook useSqlQuery pour construire la requête SQL en fonction des états actuels
-    const sqlQuery = useSqlQuery(selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy, orderDirection, joins);
+    const sqlQuery = useSqlQuery(selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy, joins);
 
     // Initialise et gère l'état du résultat de la requête
     const [queryResult, setQueryResult] = useState([]);
@@ -122,6 +123,7 @@ function App() {
         setSelectedColumns([]);
         setLimit(null);
         setOffset(null);
+        setJoins([]);
         // Réinitialise les conditions WHERE et ORDER BY.
         clearWhereConditions();
         clearOrderBy();
