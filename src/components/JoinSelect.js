@@ -29,6 +29,7 @@ const JoinSelect = ({ joins, foreignKeys, onChange, onRemove }) => {
         if (relevantForeignKey) {
             onChange({
                 ...joins,
+                tableName: relevantForeignKey.tableName,
                 columnName: relevantForeignKey.columnName
             });
         }

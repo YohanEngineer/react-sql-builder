@@ -50,7 +50,7 @@ function App() {
     const [joins, setJoins] = useState([]);
 
     const handleAddJoinClick = () => {
-        setJoins([...joins, { column: '', joinType: '', foreignTableName: '', foreignColumnName: '' }]);
+        setJoins([...joins, { tableName: '', column: '', joinType: '', foreignTableName: '', foreignColumnName: '' }]);
     };
 
     const handleJoinChange = (index, updatedJoin) => {
@@ -63,6 +63,8 @@ function App() {
         const newColumns = columns.filter((column) => column.table !== joins[index].foreignTableName);
         setColumns(newColumns);
     };
+
+
 
     useEffect(() => {
         if (joins.length > 0) {
@@ -83,16 +85,19 @@ function App() {
                     .then(response => response.json())
                     .then(data => {
                         const newForeignKeys = [...foreignKeys, ...data];
-                        const uniqueForeignKeys = newForeignKeys.filter((fk, index, self) =>
-                            index === self.findIndex((t) => (
-                                t.table === fk.table && t.columnName === fk.columnName
-                            ))
-                        );
+                        const uniqueForeignKeys = newForeignKeys.reduce((accumulator, currentKey) => {
+                            const exists = accumulator.some(key => key.table === currentKey.table && key.columnName === currentKey.columnName);
+                            if (!exists) {
+                                accumulator.push(currentKey);
+                            }
+                            return accumulator;
+                        }, []);
                         setForeignKeys(uniqueForeignKeys);
                     }
                     );
             }
         }
+        console.log(foreignKeys)
     }, [joins]);
 
 

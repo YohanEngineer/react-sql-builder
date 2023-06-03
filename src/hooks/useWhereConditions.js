@@ -31,11 +31,12 @@ const useWhereConditions = (columns) => {
 
     const { value: formValues } = await Swal.fire({
       title: 'Ajouter une condition WHERE',
+      width: 1000,
       html:
         '<label for="swal-column">Colonnes:</label>' +
-        `<select id="swal-column" class="swal2-input">${columnsOptions}</select>` +
+        `<select id="swal-column" class="swal2-input">${columnsOptions}</select>` + '<br></br>' +
         '<label for="swal-operator">Opérateur:</label>' +
-        '<select id="swal-operator" class="swal2-input"></select>' +
+        '<select id="swal-operator" class="swal2-input"></select>' + '<br></br>' +
         '<label for="swal-value">Valeur:</label>' +
         '<input id="swal-value" class="swal2-input" placeholder="Valeur">',
       focusConfirm: false,

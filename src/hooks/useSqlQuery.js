@@ -12,9 +12,10 @@ const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, off
     const generateJoinString = (join) => {
       const foreignTableName = join.foreignTableName;
       const foreignColumnName = join.foreignColumnName;
+      const tableName = join.tableName;
       const joinType = join.joinType || 'JOIN';
       const column = join.columnName;
-      return `${joinType} ${foreignTableName} ON ${selectedTable}.${column} = ${foreignTableName}.${foreignColumnName}`;
+      return `${joinType} ${foreignTableName} ON ${tableName}.${column} = ${foreignTableName}.${foreignColumnName}`;
     };
 
     const generateConditionString = (condition) => {
@@ -49,6 +50,7 @@ const useSqlQuery = (selectedTable, selectedColumns, whereConditions, limit, off
     let queryString = `SELECT ${columnsString} \nFROM ${selectedTable}`;
 
     if (joins.length > 0) {
+      console.log('joins', joins);
       joins.forEach((join) => {
         queryString += `\n${generateJoinString(join)}`;
       });
