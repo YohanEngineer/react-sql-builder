@@ -8,8 +8,8 @@ const OrderBySelect = ({ columns, selectedOrderBy, onChange, onDirectionChange }
       <br />
       <select multiple name="orderby" value={selectedOrderBy.map((item) => item.column)} onChange={onChange}>
         {columns.map((column) => (
-          <option key={column.column_name} value={column.column_name}>
-            {column.column_name}
+          <option key={column.column_name + column.table} value={column.table + '.' + column.column_name}>
+            {column.column_name} ({column.table})
           </option>
         ))}
       </select>

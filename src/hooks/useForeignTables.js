@@ -13,7 +13,7 @@ const useForeignTables = (selectedTable) => {
         }
     }, [selectedTable]);
 
-    return foreignKeys;
+    return { foreignKeys, setForeignKeys };
 }
 
 export default useForeignTables;

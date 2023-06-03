@@ -13,6 +13,9 @@ export const useColumns = (tableName) => {
     const fetchColumns = async () => {
       try {
         const response = await axios.get(`http://localhost:9999/information-schema/columns/${tableName}`);
+        response.data.forEach((column) => {
+          column.table = tableName;
+        });
         setColumns(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des colonnes:", error);
@@ -22,5 +25,5 @@ export const useColumns = (tableName) => {
     fetchColumns();
   }, [tableName]);
 
-  return columns;
+  return { columns, setColumns };
 };

@@ -16,7 +16,7 @@ export const ColumnSelect = ({ columns, selectedColumns, onChange }) => (
         .slice()
         .sort()
         .map((column, index) => (
-          <option key={index} value={column.column_name}>{column.column_name}</option>
+          < option key={column.table + index} value={column.table + '.' + column.column_name} > {column.column_name} ({column.table}) </option>
         ))}
     </select>
   </>

@@ -30,7 +30,7 @@ function App() {
     const [selectedTable, setSelectedTable] = useState('');
 
     // Utilise le hook useColumns pour récupérer les colonnes de la table sélectionnée
-    const columns = useColumns(selectedTable);
+    const { columns, setColumns } = useColumns(selectedTable);
     // Initialise et gère l'état des colonnes sélectionnées
     const [selectedColumns, setSelectedColumns] = useState([]);
 
@@ -46,7 +46,7 @@ function App() {
     // Initialise et gère l'état de la requête SQL éditée
     const [editedSqlQuery, setEditedSqlQuery] = useState('');
 
-    const foreignKeys = useForeignTables(selectedTable);
+    const { foreignKeys, setForeignKeys } = useForeignTables(selectedTable);
     const [joins, setJoins] = useState([]);
 
     const handleAddJoinClick = () => {
@@ -60,7 +60,41 @@ function App() {
 
     const handleRemoveJoinClick = (index) => {
         setJoins(joins.filter((join, joinIndex) => joinIndex !== index));
+        const newColumns = columns.filter((column) => column.table !== joins[index].foreignTableName);
+        setColumns(newColumns);
     };
+
+    useEffect(() => {
+        if (joins.length > 0) {
+            const lastJoin = joins[joins.length - 1];
+            if (lastJoin.foreignTableName && lastJoin.foreignColumnName) {
+                fetch(`http://localhost:9999/information-schema/columns/${lastJoin.foreignTableName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach((column) => {
+                            column.table = lastJoin.foreignTableName;
+                        });
+                        const newColumns = [...columns, ...data];
+                        setColumns(newColumns);
+                    }
+                    );
+
+                fetch(`http://localhost:9999/information-schema/foreign-keys/${lastJoin.foreignTableName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const newForeignKeys = [...foreignKeys, ...data];
+                        const uniqueForeignKeys = newForeignKeys.filter((fk, index, self) =>
+                            index === self.findIndex((t) => (
+                                t.table === fk.table && t.columnName === fk.columnName
+                            ))
+                        );
+                        setForeignKeys(uniqueForeignKeys);
+                    }
+                    );
+            }
+        }
+    }, [joins]);
+
 
     // Utilise le hook useSqlQuery pour construire la requête SQL en fonction des états actuels
     const sqlQuery = useSqlQuery(selectedTable, selectedColumns, whereConditions, limit, offset, selectedOrderBy, joins);
