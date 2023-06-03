@@ -7,7 +7,7 @@ const useWhereConditions = (columns) => {
   function getWhereOperatorsForColumnType(columnType) {
     switch (columnType) {
       case 'character varying':
-        return ['=', '<>', '>', '<', '>=', '<=', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
+        return ['=', '!=', 'LIKE', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
       case 'bigint':
         return ['=', '<>', '>', '<', '>=', '<=', 'IN', 'NOT IN', 'IS NULL', 'IS NOT NULL'];
       case 'integer':
@@ -26,7 +26,7 @@ const useWhereConditions = (columns) => {
     const columnsOptions = columns
       .slice()
       .sort()
-      .map((column) => `<option value="${column.column_name}" data-type="${column.data_type}">${column.column_name} (${column.data_type})</option>`)
+      .map((column) => `<option value="${column.column_name}" data-type="${column.data_type}">${column.column_name} (${column.data_type}) (${column.table})</option>`)
       .join('');
 
     const { value: formValues } = await Swal.fire({

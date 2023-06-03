@@ -223,7 +223,7 @@ function App() {
                             )}
                         </div>
                         <div className="select-container">
-                            {selectedTable && joins.map((join, index) => (
+                            {selectedTable && foreignKeys.length > 0 && joins.map((join, index) => (
                                 <JoinSelect
                                     key={index}
                                     joins={join}
@@ -232,7 +232,7 @@ function App() {
                                     onRemove={() => handleRemoveJoinClick(index)}
                                 />
                             ))}
-                            {selectedTable && <button className="btn btn-light" onClick={handleAddJoinClick}><b>Ajouter une jointure</b></button>}
+                            {selectedTable && foreignKeys.length > 0 && <button className="btn btn-light" onClick={handleAddJoinClick}><b>Ajouter une jointure</b></button>}
                         </div>
                         <div className="condition-container">
                             {selectedTable && <button className="btn btn-light" onClick={handleAddWhereClick}><b>Ajouter une condition</b></button>}
