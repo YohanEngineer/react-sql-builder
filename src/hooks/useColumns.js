@@ -12,7 +12,7 @@ export const useColumns = (tableName) => {
 
     const fetchColumns = async () => {
       try {
-        const response = await axios.get(`http://localhost:9999/information-schema/columns/${tableName}`);
+        const response = await axios.get(`http://172.31.249.233:9999/information-schema/columns/${tableName}`);
         response.data.forEach((column) => {
           column.table = tableName;
         });

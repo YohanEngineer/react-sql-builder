@@ -6,7 +6,7 @@ const useForeignTables = (selectedTable) => {
 
     useEffect(() => {
         if (selectedTable) {
-            axios.get(`http://localhost:9999/information-schema/foreign-keys/${selectedTable}`)
+            axios.get(`http://172.31.249.233:9999/information-schema/foreign-keys/${selectedTable}`)
                 .then(response => {
                     setForeignKeys(response.data);
                 });

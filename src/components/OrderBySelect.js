@@ -7,14 +7,15 @@ const OrderBySelect = ({ columns, selectedOrderBy, onChange, onDirectionChange }
       <br />
       <br />
       <select multiple name="orderby" value={selectedOrderBy.map((item) => item.column)} onChange={onChange}>
-        {columns.map((column) => (
-          <option key={column.column_name + column.table} value={column.table + '.' + column.column_name}>
-            {column.column_name} ({column.table})
-          </option>
-        ))}
+            {columns.map((column, index) => (
+              <option key={`${column.column_name}${column.table}${index}`} value={column.table + '.' + column.column_name}>
+                {column.column_name} ({column.table})
+              </option>
+            ))}
       </select>
+
       {selectedOrderBy.map((item, index) => (
-        <div key={item.column}>
+        <div key={`${item.column}${index}`}>
           <label htmlFor={`orderDirection-${index}`}>{item.column}:</label>
           <select
             name={`orderDirection-${index}`}

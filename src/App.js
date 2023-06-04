@@ -70,7 +70,7 @@ function App() {
         if (joins.length > 0) {
             const lastJoin = joins[joins.length - 1];
             if (lastJoin.foreignTableName && lastJoin.foreignColumnName) {
-                fetch(`http://localhost:9999/information-schema/columns/${lastJoin.foreignTableName}`)
+                fetch(`http://172.31.249.233:9999/information-schema/columns/${lastJoin.foreignTableName}`)
                     .then(response => response.json())
                     .then(data => {
                         data.forEach((column) => {
@@ -81,7 +81,7 @@ function App() {
                     }
                     );
 
-                fetch(`http://localhost:9999/information-schema/foreign-keys/${lastJoin.foreignTableName}`)
+                fetch(`http://172.31.249.233:9999/information-schema/foreign-keys/${lastJoin.foreignTableName}`)
                     .then(response => response.json())
                     .then(data => {
                         const newForeignKeys = [...foreignKeys, ...data];
@@ -170,7 +170,7 @@ function App() {
 
     // Exécute la requête SQL.
     const executeQuery = async () => {
-        const response = await fetch('http://localhost:9999/raw-sql', {
+        const response = await fetch('http://172.31.249.233:9999/raw-sql', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

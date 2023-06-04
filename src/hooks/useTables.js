@@ -7,7 +7,7 @@ export const useTables = () => {
   useEffect(() => {
     const fetchTables = async () => {
       try {
-        const response = await axios.get('http://localhost:9999/information-schema/tables');
+        const response = await axios.get('http://172.31.249.233:9999/information-schema/tables');
         setTables(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des tables:', error);
